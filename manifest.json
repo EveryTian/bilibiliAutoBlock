@@ -4,6 +4,12 @@
     "author": "EveryTian",
     "version": "1.0.0",
     "description": "基于弹幕内容的用户自动屏蔽Chrome扩展。",
+    "icons": {
+        "128": "logo.png"
+    },
+    "browser_action": {
+        "default_icon": "logo.png"
+    },
     "background": {
         "scripts": [
             "background.js"
