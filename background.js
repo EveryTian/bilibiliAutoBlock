@@ -1,4 +1,4 @@
-blockedRegexs = [];
+blockedPatterns = [];
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     var matchResult = /^https?:\/\/comment\.bilibili\.com\/\d+\.xml$/.exec(details.url);
@@ -30,15 +30,15 @@ function analyze(xmlString) {
 }
 
 function danmakuBlockCheck(danmakuContent) {
-    for (var i = 0; i < blockedRegexs.length; ++i) {
-        var blockedRegex = blockedRegexs[i];
-        if (!blockedRegex) {
+    for (var i = 0; i < blockedPatterns.length; ++i) {
+        var blockedPattern = blockedPatterns[i];
+        if (!blockedPattern) {
             continue;
         }
-        if (typeof blockedRegex === 'string') {
-            blockedRegex = new RegExp(blockedRegex);
+        if (typeof blockedPattern === 'string' && blockedPattern !== '' && danmakuContent.indexOf(blockedPattern) !== -1) {
+            return true;
         }
-        if (blockedRegex.exec(danmakuContent)) {
+        if (Object.prototype.toString.call(blockedPattern) === '[object RegExp]' && blockedPattern.exec(danmakuContent)) {
             return true;
         }
     }
