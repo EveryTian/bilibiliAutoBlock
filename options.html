@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bilibiliAutoBlock Options</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f7f7f7;
+            padding: 30px;
+        }
+
+        table.layout {
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        table.layout td {
+            border-top: 1px solid #aaa;
+            padding: 1em;
+        }
+
+        table.layout td:first-child, td:last-child {
+            width: calc(50% - 500px);
+        }
+
+        table.layout td:nth-child(2) {
+            min-width: 150px;
+            width: 150px;
+            font-size: 1.5em;
+            padding-right: 1em;
+            padding-top: 1em;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        table.layout td:nth-child(3) {
+            min-width: 400px;
+            width: 70%;
+        }
+
+        table.table {
+            border-spacing: 0;
+            width: 100%;
+            border: solid #ccc 1px;
+            border-radius: 5px;
+            box-shadow: 0 1px 1px #ccc;
+        }
+
+        table.table tr {
+            transition: all 150ms ease-in-out;
+        }
+
+        table.table tbody tr:hover {
+            background-color: #fcfcfc;
+            box-shadow: 0 2px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        table.table td, table.table th {
+            border-left: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            padding: 5px;
+            text-align: left;
+        }
+
+        table.table th {
+            background-color: #dce9f9;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            border-top: none;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        table.table td:first-child, table.table th:first-child {
+            border-left: none;
+        }
+
+        table.table td:nth-child(2) {
+            width: auto;
+            max-width: 70%;
+            padding-right: 1em;
+            padding-top: 5px;
+            text-align: left;
+            vertical-align: center;
+            font-size: 0.8em;
+            font-family: Consolas, sans-serif;
+        }
+
+        table.table td:nth-child(3) {
+            min-width: 10px;
+            width: 10px;
+            text-align: center;
+        }
+
+        table.table th:first-child {
+            border-radius: 5px 0 0 0;
+            max-width: available;
+            min-width: 50px;
+        }
+
+        table.table th:last-child {
+            border-radius: 0 5px 0 0;
+        }
+
+        table.table tr:first-child td:first-child {
+            border-radius: 0 0 0 5px;
+        }
+
+        table.table tr:last-child td:last-child {
+            border-radius: 0 0 5px 0;
+            min-width: 50px;
+        }
+
+        button {
+            transition-duration: 0.4s;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            padding: 2px 5px;
+        }
+
+        button:hover.delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button:hover.add {
+            background-color: #96b97d;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<table class="layout">
+    <tbody>
+    <tr>
+        <td></td>
+        <td>匹配模式</td>
+        <td>
+            <div style="overflow: auto; height: 70%;">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th style="text-align: center">所屏蔽匹配模式</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>正则</td>
+                        <td>(第|前)[0123456789〇零一二三四五六七八九十百]+</td>
+                        <td>
+                            <button type="button" class="delete" onclick="">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>正则</td>
+                        <td>23{7}</td>
+                        <td>
+                            <button type="button" class="delete" onclick="">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>文本</td>
+                        <td>可爱想</td>
+                        <td>
+                            <button type="button" class="delete" onclick="">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <button type="button" class="add" onclick="">添加</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
