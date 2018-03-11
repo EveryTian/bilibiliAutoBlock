@@ -35,10 +35,10 @@ function danmakuBlockCheck(danmakuContent) {
         if (!blockedPattern) {
             continue;
         }
-        if (typeof blockedPattern === 'string' && blockedPattern !== '' && danmakuContent.indexOf(blockedPattern) !== -1) {
+        if (isString(blockedPattern) && blockedPattern !== '' && danmakuContent.indexOf(blockedPattern) !== -1) {
             return true;
         }
-        if (Object.prototype.toString.call(blockedPattern) === '[object RegExp]' && blockedPattern.exec(danmakuContent)) {
+        if (isRegExp(blockedPattern) && blockedPattern.exec(danmakuContent)) {
             return true;
         }
     }
@@ -54,4 +54,12 @@ function submitBlockedUsers(blockedUsers) {
         xmlHttpRequest.send('type=2&filter=' + blockUser + '&jsonp=jsonp&csrf');
     }
     blockedUsers.forEach(submitBlockedUser);
+}
+
+function isString(obj) {
+    return typeof obj === 'string';
+}
+
+function isRegExp(obj) {
+    return Object.prototype.toString.call(obj) === '[object RegExp]';
 }
