@@ -124,16 +124,36 @@
             padding: 2px 5px;
         }
 
-        button:hover.delete {
+        button:hover.delete-button {
             background-color: #f44336;
             color: white;
         }
 
-        button:hover.add {
+        button:hover#add-button {
             background-color: #96b97d;
             color: white;
         }
 
+        select {
+            border: 0px;
+            font-size: 0.82em;
+            appearance: none;
+            background: no-repeat scroll right center transparent;
+        }
+
+        input[type="text"] {
+            border: 1px solid #ccc;
+            padding: 5px 5px;
+            border-radius: 3px;
+            width: 100%;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            transition: border-color ease-in-out 200ms, box-shadow ease-in-out 200ms
+        }
+
+        input[type="text"]:focus {
+            border-color: #66afe9;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.5)
+        }
     </style>
 </head>
 <body>
@@ -157,28 +177,34 @@
                         <td>正则</td>
                         <td>(第|前)[0123456789〇零一二三四五六七八九十百]+</td>
                         <td>
-                            <button type="button" class="delete" onclick="">删除</button>
+                            <button type="button" class="delete-button" onclick="deleteButtonClick(this)">删除
+                            </button>
                         </td>
                     </tr>
                     <tr>
                         <td>正则</td>
                         <td>23{7}</td>
                         <td>
-                            <button type="button" class="delete" onclick="">删除</button>
+                            <button type="button" class="delete-button" onclick="deleteButtonClick(this)">删除</button>
                         </td>
                     </tr>
                     <tr>
                         <td>文本</td>
                         <td>可爱想</td>
                         <td>
-                            <button type="button" class="delete" onclick="">删除</button>
+                            <button type="button" class="delete-button" onclick="deleteButtonClick(this)">删除</button>
                         </td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
                         <td>
-                            <button type="button" class="add" onclick="">添加</button>
+                            <select name="select-type">
+                                <option value="regexp">正则</option>
+                                <option value="string">文本</option>
+                            </select>
+                        </td>
+                        <td><input type="text" placeholder="请输入匹配模式"/></td>
+                        <td>
+                            <button type="button" id="add-button" onclick="addButtonClick(this)">添加</button>
                         </td>
                     </tr>
                     </tbody>
@@ -189,5 +215,6 @@
     </tr>
     </tbody>
 </table>
+<script src="options.js"></script>
 </body>
 </html>
