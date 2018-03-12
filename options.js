@@ -1,13 +1,40 @@
+var blockedPatterns = {}; // e.g. { "R#23{7}" : true, "T#可爱想" : false }, { formatString : isRegExp, ... }
+document.getElementById('add-button').onclick = function () {
+    addButtonClick(this);
+};
+
 function generateBlockedPatternTable() {
-    // TODO
+    blockedPatterns = JSON.parse(localStorage.blockedPatterns);
+    for (var pattern in blockedPatterns) {
+        if (!blockedPatterns.hasOwnProperty(pattern)) {
+            continue;
+        }
+        var isRegExp = blockedPatterns[pattern];
+        if (typeof isRegExp !== 'boolean' || pattern.substring(0, 2) !== (isRegExp ? 'R#' : 'T#')) {
+            delete blockedPatterns[pattern];
+        } else {
+            addNewPatternTr(isRegExp, pattern.substring(2));
+        }
+    }
 }
 
 function removePatternFromLocalStorage(isRegExp, pattern) {
-    // TODO
+    delete blockedPatterns[(isRegExp ? 'R#' : 'T#') + pattern];
+    updateLocalStoragePatterns();
 }
 
 function addPatternToLocalStorage(isRegExp, pattern) {
-    // TODO
+    var newPatternFormatString = (isRegExp ? 'R#' : 'T#') + pattern;
+    if (blockedPatterns[newPatternFormatString]) {
+        return false;
+    }
+    blockedPatterns[newPatternFormatString] = isRegExp;
+    updateLocalStoragePatterns();
+    return true;
+}
+
+function updateLocalStoragePatterns() {
+    localStorage.blockedPatterns = JSON.stringify(blockedPatterns);
 }
 
 function deleteButtonClick(obj) {
@@ -35,6 +62,7 @@ function addButtonClick(obj) {
     var input = addNewTrChildren[1].children[0];
     var pattern = input.value;
     if (pattern === '') {
+        input.placeholder = '模式不能为空。';
         return;
     }
     var isRegExp;
@@ -48,15 +76,23 @@ function addButtonClick(obj) {
         default:
             return;
     }
-    addPatternToLocalStorage(isRegExp, pattern);
-    addNewPatternTr(isRegExp, pattern);
-    input.value = "";
+    if (addPatternToLocalStorage(isRegExp, pattern)) {
+        addNewPatternTr(isRegExp, pattern);
+        input.placeholder = '请输入匹配模式';
+        input.value = '';
+    } else {
+        input.placeholder = '屏蔽模式已存在。';
+        input.value = '';
+    }
 }
 
 function addNewPatternTr(isRegExp, pattern) {
     var newTr = document.createElement('tr');
     newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
-        + '<td><button type="button" class="delete-button" onclick="deleteButtonClick(this)">删除</button></td>';
+        + '<td><button type="button" class="delete-button">删除</button></td>';
+    newTr.getElementsByTagName('button')[0].onclick = function () {
+        deleteButtonClick(this);
+    };
     var addNewTr = document.getElementById('add-button').parentElement.parentElement;
     addNewTr.parentElement.insertBefore(newTr, addNewTr);
 }

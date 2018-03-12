@@ -1,5 +1,3 @@
-blockedPatterns = [];
-
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     var matchResult = /^https?:\/\/comment\.bilibili\.com\/\d+\.xml$/.exec(details.url);
     if (matchResult && details.type === 'xmlhttprequest') {
@@ -8,7 +6,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
             if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200) {
                 analyze(xmlHttpRequest.responseText);
             }
-        }
+        };
         xmlHttpRequest.open('GET', matchResult[0] + '?bilibiliAutoBlock', true);
         xmlHttpRequest.send(null);
     }
@@ -30,6 +28,7 @@ function analyze(xmlString) {
 }
 
 function danmakuBlockCheck(danmakuContent) {
+    var blockedPatterns = getBlockedPatterns();
     for (var i = 0; i < blockedPatterns.length; ++i) {
         var blockedPattern = blockedPatterns[i];
         if (!blockedPattern) {
@@ -62,4 +61,18 @@ function isString(obj) {
 
 function isRegExp(obj) {
     return Object.prototype.toString.call(obj) === '[object RegExp]';
+}
+
+function getBlockedPatterns() {
+    var blockedPatterns = [];
+    var blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
+    for (var patternFormatString in blockedPatternsJson) {
+        if (blockedPatternsJson.hasOwnProperty(patternFormatString)) {
+            blockedPatterns.push(
+                blockedPatternsJson[patternFormatString] ?
+                    new RegExp(patternFormatString.substring(2)) :
+                    patternFormatString.substring(2));
+        }
+    }
+    return blockedPatterns;
 }
