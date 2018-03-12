@@ -68,6 +68,12 @@ function addButtonClick(obj) {
     var isRegExp;
     switch (addNewTrChildren[0].children[0].value) {
         case 'regexp':
+            try {
+                new RegExp(pattern);
+            } catch(err) {
+                alert('正则表达式语法不正确。');
+                return;
+            }
             isRegExp = true;
             break;
         case 'string':
