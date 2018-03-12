@@ -64,8 +64,12 @@ function isRegExp(obj) {
 }
 
 function getBlockedPatterns() {
+    var localStorageBlockedPatterns = localStorage.blockedPatterns;
+    if (localStorageBlockedPatterns) {
+    	return [];
+    }
     var blockedPatterns = [];
-    var blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
+    var blockedPatternsJson = JSON.parse(localStorageBlockedPatterns);
     for (var patternFormatString in blockedPatternsJson) {
         if (blockedPatternsJson.hasOwnProperty(patternFormatString)) {
             blockedPatterns.push(
