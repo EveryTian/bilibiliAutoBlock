@@ -65,7 +65,7 @@ function isRegExp(obj) {
 
 function getBlockedPatterns() {
     var localStorageBlockedPatterns = localStorage.blockedPatterns;
-    if (!localStorageBlockedPatterns) {
+    if (localStorageBlockedPatterns) {
     	return [];
     }
     var blockedPatterns = [];
