@@ -1,3 +1,6 @@
+var blockedPatterns = [];
+localStorage.isBlockedPatternsChanged = 'true';
+
 const debugSwitch = true;
 
 var debugLog = debugSwitch ? console.log : function () {
@@ -28,23 +31,28 @@ function analyze(xmlString) {
     if (!xmlString) {
         return;
     }
+    if (localStorage.isBlockedPatternsChanged === 'true') {
+        console.log('Updating Blocked Patterns...');
+        updateBlockedPatterns();
+        localStorage.isBlockedPatternsChanged = 'false';
+        console.log('Blocked Patterns Updated.');
+    }
     debugLog('Analyzing Danmaku...');
-    debugLog(' | XML String:', xmlString);
+    debugLog('XML String:', xmlString);
     var xmlDom = document.createElement('div');
     xmlDom.innerHTML = xmlString;
-    debugLog(' | XML DOM:', xmlDom);
+    debugLog('XML DOM:', xmlDom);
     var danmakuElements = xmlDom.getElementsByTagName('d');
-    debugLog(' | XML DOM Danmaku Elements:', danmakuElements);
+    debugLog('XML DOM Danmaku Elements:', danmakuElements);
+    debugLog('Blocked Patterns:', blockedPatterns);
     var blockedDanmaku = [].filter.call(danmakuElements, x => danmakuBlockCheck(x.innerHTML));
-    debugLog(' | Blocked Danmaku:', blockedDanmaku);
+    debugLog('Blocked Danmaku:', blockedDanmaku);
     var blockedUsers = [].map.call(blockedDanmaku, x => x.getAttribute('p').split(',')[6]);
-    debugLog(' | Blocked Users:', blockedUsers);
+    debugLog('Blocked Users:', blockedUsers);
     submitBlockedUsers(blockedUsers);
 }
 
 function danmakuBlockCheck(danmakuContent) {
-    var blockedPatterns = getBlockedPatterns();
-    debugLog('Blocked Patterns:', blockedPatterns);
     for (var i = 0; i < blockedPatterns.length; ++i) {
         var blockedPattern = blockedPatterns[i];
         if (!blockedPattern) {
@@ -81,13 +89,13 @@ function isRegExp(obj) {
     return Object.prototype.toString.call(obj) === '[object RegExp]';
 }
 
-function getBlockedPatterns() {
+function updateBlockedPatterns() {
     var localStorageBlockedPatterns = localStorage.blockedPatterns;
     if (!localStorageBlockedPatterns) {
         return [];
     }
     debugLog("Blocked Patterns Local Storage:", localStorageBlockedPatterns);
-    var blockedPatterns = [];
+    blockedPatterns = [];
     var blockedPatternsJson = JSON.parse(localStorageBlockedPatterns);
     debugLog('Blocked Patterns JSON:', blockedPatternsJson);
     for (var patternFormatString in blockedPatternsJson) {

@@ -35,6 +35,7 @@ function addPatternToLocalStorage(isRegExp, pattern) {
 
 function updateLocalStoragePatterns() {
     localStorage.blockedPatterns = JSON.stringify(blockedPatterns);
+    localStorage.isBlockedPatternsChanged = 'true';
 }
 
 function deleteButtonClick(obj) {
