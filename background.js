@@ -6,12 +6,12 @@ const debugSwitch = true;
 var debugLog = debugSwitch ? console.log : function () {
 };
 
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
+chrome.webRequest.onBeforeRequest.addListener(function (details) {
     var matchResult = /^https?:\/\/comment\.bilibili\.com\/\d+\.xml$/.exec(details.url);
     if (matchResult && details.type === 'xmlhttprequest') {
         var xmlHttpRequest = new XMLHttpRequest();
         debugLog('Danmaku File URI:', matchResult[0]);
-        xmlHttpRequest.onreadystatechange = function() {
+        xmlHttpRequest.onreadystatechange = function () {
             debugLog('     | readyState:', xmlHttpRequest.readyState);
             debugLog('     | status:', xmlHttpRequest.status);
             if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200) {
@@ -73,10 +73,14 @@ function submitBlockedUsers(blockedUsers) {
         var xmlHttpRequest = new XMLHttpRequest();
         debugLog(' | Submitting `' + blockedUser + '`...');
         xmlHttpRequest.withCredentials = true;
+        xmlHttpRequest.onreadystatechange = function () {
+            // TODO
+        }
         xmlHttpRequest.open('POST', 'https://api.bilibili.com/x/dm/filter/user/add', true);
         xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         xmlHttpRequest.send('type=2&filter=' + blockedUser + '&jsonp=jsonp&csrf');
     }
+
     debugLog('Submitting Blocked Users...');
     blockedUsers.forEach(submitBlockedUser);
 }

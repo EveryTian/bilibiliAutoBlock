@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bilibiliAutoBlock Options</title>
+    <link rel="stylesheet" type="text/css" href="options.css">
+</head>
+<body>
+<table class="layout">
+    <thead>
+    <tr>
+        <td></td>
+        <td><img src="../img/logo.png" alt="bilibiliAutoBlock" height="50"/></td>
+        <td><h1>bilibliAutoBlock 选项</h1></td>
+        <td></td>  
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td></td>
+        <td>匹配模式</td>
+        <td>
+            <div style="overflow: auto; height: 70%;">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th style="text-align: center">所屏蔽匹配模式</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <select name="select-type" title="模式类型">
+                                <option value="regexp">正则</option>
+                                <option value="string">文本</option>
+                            </select>
+                        </td>
+                        <td><input type="text" placeholder="请输入匹配模式"/></td>
+                        <td>
+                            <button type="button" id="add-button">添加</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+<script src="options.js"></script>
+</body>
+</html>
