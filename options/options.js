@@ -1,17 +1,19 @@
 let blockedPatternsJson = {}; // e.g. { "R#23{7}" : true, "T#可爱想" : false }, { formatString : isRegExp, ... }
-document.getElementById('add-button').onclick = () => {
+document.getElementById('add-button').onclick = function () {
     addButtonClick(this);
 };
 
 function generateBlockedPatternTable() {
-    blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
-    for (let pattern in blockedPatternsJson) {
-        if (blockedPatternsJson.hasOwnProperty(pattern)) {
-            let isRegExp = blockedPatternsJson[pattern];
-            if (typeof isRegExp !== 'boolean' || pattern.substring(0, 2) !== (isRegExp ? 'R#' : 'T#')) {
-                delete blockedPatternsJson[pattern];
-            } else {
-                addNewPatternTr(isRegExp, pattern.substring(2));
+    if (localStorage.blockedPatterns) {
+        blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
+        for (let pattern in blockedPatternsJson) {
+            if (blockedPatternsJson.hasOwnProperty(pattern)) {
+                let isRegExp = blockedPatternsJson[pattern];
+                if (typeof isRegExp !== 'boolean' || pattern.substring(0, 2) !== (isRegExp ? 'R#' : 'T#')) {
+                    delete blockedPatternsJson[pattern];
+                } else {
+                    addNewPatternTr(isRegExp, pattern.substring(2));
+                }
             }
         }
     }
@@ -96,7 +98,7 @@ function addNewPatternTr(isRegExp, pattern) {
     let newTr = document.createElement('tr');
     newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
         + '<td><button type="button" class="delete-button">删除</button></td>';
-    newTr.getElementsByTagName('button')[0].onclick = () => {
+    newTr.getElementsByTagName('button')[0].onclick = function () {
         deleteButtonClick(this);
     };
     let addNewTr = document.getElementById('add-button').parentElement.parentElement;
