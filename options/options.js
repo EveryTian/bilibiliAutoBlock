@@ -6,16 +6,19 @@ document.getElementById('add-button').onclick = function () {
 function generateBlockedPatternTable() {
     if (localStorage.blockedPatterns) {
         blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
+        let documentFragment = new DocumentFragment();
         for (let pattern in blockedPatternsJson) {
             if (blockedPatternsJson.hasOwnProperty(pattern)) {
                 let isRegExp = blockedPatternsJson[pattern];
                 if (typeof isRegExp !== 'boolean' || pattern.substring(0, 2) !== (isRegExp ? 'R#' : 'T#')) {
                     delete blockedPatternsJson[pattern];
                 } else {
-                    addNewPatternTr(isRegExp, pattern.substring(2));
+                    addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern.substring(2));
                 }
             }
         }
+        let addNewTr = document.getElementById('add-button').parentElement.parentElement;
+        addNewTr.parentElement.insertBefore(documentFragment, addNewTr);
     }
 }
 
@@ -98,11 +101,21 @@ function addNewPatternTr(isRegExp, pattern) {
     let newTr = document.createElement('tr');
     newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
         + '<td><button type="button" class="delete-button">删除</button></td>';
-    newTr.getElementsByTagName('button')[0].onclick = function () {
+    newTr.getElementsByTagName('button')[0].onclick = () => {
         deleteButtonClick(this);
     };
     let addNewTr = document.getElementById('add-button').parentElement.parentElement;
     addNewTr.parentElement.insertBefore(newTr, addNewTr);
+}
+
+function addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern) {
+    let newTr = document.createElement('tr');
+    newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
+        + '<td><button type="button" class="delete-button">删除</button></td>';
+    newTr.getElementsByTagName('button')[0].onclick = function () {
+        deleteButtonClick(this);
+    };
+    documentFragment.appendChild(newTr);
 }
 
 generateBlockedPatternTable();
