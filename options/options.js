@@ -2,6 +2,11 @@ let blockedPatternsJson = {}; // e.g. { "R#23{7}" : true, "T#可爱想" : false 
 document.getElementById('add-button').onclick = function () {
     addButtonClick(this);
 };
+document.getElementById('pattern-input').onkeydown = keyEvent => {
+    if (keyEvent.keyCode === 13) { // Enter
+        document.getElementById('add-button').click();
+    }
+};
 
 function generateBlockedPatternTable() {
     if (localStorage.blockedPatterns) {
