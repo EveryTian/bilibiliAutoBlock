@@ -105,7 +105,7 @@ function submitBlockedUsers(blockedUsersInfo) {
                 if (isEmptyObject(submittedUsersInfo)) {
                     return;
                 }
-                let key = '#LOG#' + getDateTimeString();
+                let key = '#LOG#' + new Date().getTime();
                 localStorage[key] = JSON.stringify(submittedUsersInfo);
                 console.log(key, ':', submittedUsersInfo);
             } else {
@@ -125,12 +125,6 @@ function isRegExp(obj) {
     return Object.prototype.toString.call(obj) === '[object RegExp]';
 }
 
-function getDateTimeString() {
-    let date = new Date();
-    return '' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDay()
-        + ' ' + date.getHours() + ':' + date.getMinutes()
-        + '#' + date.getSeconds() + '.' + date.getMilliseconds(); // Use to avoid conflict.
-}
 
 function isEmptyObject(obj) {
     for (let key in obj) {
