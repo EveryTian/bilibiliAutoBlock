@@ -34,7 +34,7 @@ function removePatternFromLocalStorage(isRegExp, pattern) {
 
 function addPatternToLocalStorage(isRegExp, pattern) {
     let newPatternFormatString = (isRegExp ? 'R#' : 'T#') + pattern;
-    if (blockedPatternsJson[newPatternFormatString]) {
+    if (newPatternFormatString in blockedPatternsJson) {
         return false;
     }
     blockedPatternsJson[newPatternFormatString] = isRegExp;
@@ -104,9 +104,9 @@ function addButtonClick(obj) {
 
 function addNewPatternTr(isRegExp, pattern) {
     let newTr = document.createElement('tr');
-    newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
-        + '<td><button type="button" class="delete-button">删除</button></td>';
-    newTr.getElementsByTagName('button')[0].onclick = () => {
+    newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td><td>' + pattern
+        + '</td><td><button type="button" class="delete-button">删除</button></td>';
+    newTr.getElementsByTagName('button')[0].onclick = function () {
         deleteButtonClick(this);
     };
     let addNewTr = document.getElementById('add-button').parentElement.parentElement;
@@ -115,8 +115,8 @@ function addNewPatternTr(isRegExp, pattern) {
 
 function addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern) {
     let newTr = document.createElement('tr');
-    newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td>' + '<td>' + pattern + '</td>'
-        + '<td><button type="button" class="delete-button">删除</button></td>';
+    newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td><td>' + pattern
+        + '</td><td><button type="button" class="delete-button">删除</button></td>';
     newTr.getElementsByTagName('button')[0].onclick = function () {
         deleteButtonClick(this);
     };
