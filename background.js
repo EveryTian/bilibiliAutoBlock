@@ -85,11 +85,12 @@ function submitBlockedUsers(blockedUsersInfo) {
             debugLog('     | `' + blockedUserId + '` readyState:', xmlHttpRequest.readyState);
             debugLog('     | `' + blockedUserId + '` status:', xmlHttpRequest.status);
             if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200) {
-                // {"code":0,"data":{"id":\d{6},"mid":0,"type":0,"filter":"","comment":""},"message":"0","ttl":1}
+                // {"code":0,"data":{"id":blockId,"mid":0,"type":0,"filter":userId,"comment":""},"message":"0","ttl":1}
                 let blockResponse = JSON.parse(xmlHttpRequest.responseText);
                 if (blockResponse.code === 0) {
-                    debugLog('     | Block `' + blockedUserId + '(' + submittedUsersInfo[blockedUserId] + ')` Successfully.');
-                    submittedUsersInfo[blockedUserId] = blockedUsersInfo[blockedUserId];
+                    debugLog('     | Block `' + blockedUserId + '('
+                        + submittedUsersInfo[blockedUserId] + ')` Successfully.');
+                    submittedUsersInfo[blockedUserId + '&' + blockResponse.data.id] = blockedUsersInfo[blockedUserId];
                     ++submittedUsersCount;
                 }
             }
@@ -124,7 +125,6 @@ function isString(obj) {
 function isRegExp(obj) {
     return Object.prototype.toString.call(obj) === '[object RegExp]';
 }
-
 
 function isEmptyObject(obj) {
     for (let key in obj) {
