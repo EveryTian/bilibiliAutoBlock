@@ -1,12 +1,122 @@
 let blockedPatternsJson = {}; // e.g. { "R#23{7}" : true, "T#可爱想" : false }, { formatString : isRegExp, ... }
-document.getElementById('add-button').onclick = function () {
-    addButtonClick(this);
-};
-document.getElementById('pattern-input').onkeydown = keyEvent => {
-    if (keyEvent.keyCode === 13) { // Enter
-        document.getElementById('add-button').click();
+const regExpPrefix = storageName.regExpPrefix;
+const textPrefix = storageName.textPrefix;
+
+function initElements() {
+    // Add pattern button click:
+    document.getElementById('add-button').onclick = function () {
+        addButtonClick(this);
+    };
+    // Enter key event for input box:
+    document.getElementById('pattern-input').onkeydown = keyEvent => {
+        if (keyEvent.keyCode === 13) { // Enter
+            document.getElementById('add-button').click();
+        }
+    };
+    // 5 checkboxes initialization:
+    let bottomExceptionCheckbox = document.getElementById('bottom-exception');
+    let topExceptionCheckbox = document.getElementById('top-exception');
+    let conversedExceptionCheckbox = document.getElementById('conversed-exception');
+    let advancedExceptionCheckbox = document.getElementById('advanced-exception');
+    let subtitleExceptionCheckbox = document.getElementById('subtitle-exception');
+    bottomExceptionCheckbox.onclick = topExceptionCheckbox.onclick = conversedExceptionCheckbox.onclick =
+        advancedExceptionCheckbox.onclick = subtitleExceptionCheckbox.onclick = function () {
+            checkboxClick(this);
+        };
+    bottomExceptionCheckbox.checked = localStorage[storageName.bottomException] === storageName.true;
+    topExceptionCheckbox.checked = localStorage[storageName.topException] === storageName.true;
+    conversedExceptionCheckbox.checked = localStorage[storageName.conversedException] === storageName.true;
+    advancedExceptionCheckbox.checked = localStorage[storageName.advancedException] === storageName.true;
+    subtitleExceptionCheckbox.checked = localStorage[storageName.subtitleException] === storageName.true;
+    // Date exception:
+    let curYear = new Date().getFullYear();
+    let selectYearElement = document.getElementById('select-year');
+    let selectYearOptions = selectYearElement.options;
+    for (let year = 2009; year < curYear; ++year) {
+        let yearString = '' + year;
+        selectYearOptions.add(new Option(yearString, yearString));
     }
-};
+    selectYearOptions.add(new Option('' + curYear, '' + curYear, true, true));
+    let selectMonthElement = document.getElementById('select-month');
+    let selectMonthOptions = selectMonthElement.options;
+    for (let month = 1; month <= 12; ++month) {
+        let monthString = '' + month;
+        selectMonthOptions.add(new Option(monthString, monthString.length === 2 ? monthString : '0' + monthString));
+    }
+    let selectDayElement = document.getElementById('select-day');
+    let updateDateExceptionString = () => {
+        localStorage[storageName.dateException] = document.getElementById('select-year').value + '-' +
+            document.getElementById('select-month').value + '-' + document.getElementById('select-day').value;
+        localStorage[storageName.isSpecialOptionsChanged] = storageName.true;
+    };
+    selectYearElement.onchange = selectMonthElement.onchange = () => {
+        generateSelectDayOptions();
+        updateDateExceptionString();
+    };
+    selectDayElement.onchange = updateDateExceptionString;
+    let dateExceptionCheckbox = document.getElementById('date-exception');
+    dateExceptionCheckbox.onclick = function () {
+        if (this.checked) {
+            document.getElementById('select-date').hidden = false;
+            updateDateExceptionString();
+        } else {
+            document.getElementById('select-date').hidden = true;
+            localStorage[storageName.dateException] = '';
+            localStorage[storageName.isSpecialOptionsChanged] = storageName.true;
+        }
+    };
+    let dateExceptionString = localStorage[storageName.dateException];
+    if (dateExceptionString !== '') {
+        let yearString = dateExceptionString.substring(0, 4);
+        let monthString = dateExceptionString.substring(5, 7);
+        let dayString = dateExceptionString.substring(8, 10);
+        selectYearElement.value = yearString;
+        selectMonthElement.value = monthString;
+        generateSelectDayOptions();
+        selectDayElement.value = dayString;
+        dateExceptionCheckbox.checked = true;
+        document.getElementById('select-date').hidden = false;
+    } else {
+        generateSelectDayOptions();
+        dateExceptionCheckbox.checked = false;
+        document.getElementById('select-date').hidden = true;
+    }
+    // Select expiration time:
+    let selectRecordExpirationTime = document.getElementById('record-expiration-time');
+    selectRecordExpirationTime.onchange = function () {
+        localStorage[storageName.recordExpirationTime] = this.value;
+    };
+    selectRecordExpirationTime.value = localStorage[storageName.recordExpirationTime];
+    // Clear history button click:
+    document.getElementById('clear-history').onclick = () => {
+        if (confirm('确认清空历史屏蔽记录？') === true) {
+            const recordStampPrefix = storageName.recordStampPrefix;
+            const recordStampPrefixLength = recordStampPrefix.length;
+            Object.keys(localStorage).forEach(key => {
+                if (key.substring(0, recordStampPrefixLength) === recordStampPrefix) {
+                    delete localStorage[key];
+                }
+            });
+        }
+    };
+}
+
+function generateSelectDayOptions() {
+    let dayNum = getDaysNum(parseInt(document.getElementById('select-year').value),
+        parseInt(document.getElementById('select-month').value));
+    let selectDayOptions = document.getElementById('select-day').options;
+    let curSelectDayOptionsNum = selectDayOptions.length;
+    if (curSelectDayOptionsNum > dayNum) {
+        for (let i = curSelectDayOptionsNum - 1; i >= dayNum; --i) {
+            selectDayOptions.remove(i);
+        }
+    } else if (curSelectDayOptionsNum < dayNum) {
+        for (let day = curSelectDayOptionsNum + 1; day <= dayNum; ++day) {
+            let dayString = '' + day;
+            selectDayOptions.add(new Option(dayString, dayString.length === 2 ? dayString : '0' + dayString));
+        }
+    }
+}
 
 function generateBlockedPatternTable() {
     if (localStorage.blockedPatterns) {
@@ -15,7 +125,8 @@ function generateBlockedPatternTable() {
         for (let pattern in blockedPatternsJson) {
             if (blockedPatternsJson.hasOwnProperty(pattern)) {
                 let isRegExp = blockedPatternsJson[pattern];
-                if (typeof isRegExp !== 'boolean' || pattern.substring(0, 2) !== (isRegExp ? 'R#' : 'T#')) {
+                if (typeof isRegExp !== 'boolean' ||
+                    pattern.substring(0, 2) !== (isRegExp ? regExpPrefix : textPrefix)) {
                     delete blockedPatternsJson[pattern];
                 } else {
                     addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern.substring(2));
@@ -28,12 +139,12 @@ function generateBlockedPatternTable() {
 }
 
 function removePatternFromLocalStorage(isRegExp, pattern) {
-    delete blockedPatternsJson[(isRegExp ? 'R#' : 'T#') + pattern];
+    delete blockedPatternsJson[(isRegExp ? regExpPrefix : textPrefix) + pattern];
     updateLocalStoragePatterns();
 }
 
 function addPatternToLocalStorage(isRegExp, pattern) {
-    let newPatternFormatString = (isRegExp ? 'R#' : 'T#') + pattern;
+    let newPatternFormatString = (isRegExp ? regExpPrefix : textPrefix) + pattern;
     if (newPatternFormatString in blockedPatternsJson) {
         return false;
     }
@@ -44,7 +155,32 @@ function addPatternToLocalStorage(isRegExp, pattern) {
 
 function updateLocalStoragePatterns() {
     localStorage.blockedPatterns = JSON.stringify(blockedPatternsJson);
-    localStorage.isBlockedPatternsChanged = 'true';
+    localStorage.isBlockedPatternsChanged = storageName.true;
+}
+
+function checkboxClick(obj) {
+    let exceptionName;
+    switch (obj.id) {
+        case 'bottom-exception':
+            exceptionName = storageName.bottomException;
+            break;
+        case 'top-exception':
+            exceptionName = storageName.topException;
+            break;
+        case 'conversed-exception':
+            exceptionName = storageName.conversedException;
+            break;
+        case 'advanced-exception':
+            exceptionName = storageName.advancedException;
+            break;
+        case 'subtitle-exception':
+            exceptionName = storageName.subtitleException;
+            break;
+        default:
+            return;
+    }
+    localStorage[exceptionName] = obj.checked ? storageName.true : storageName.false;
+    localStorage[storageName.isSpecialOptionsChanged] = storageName.true;
 }
 
 function deleteButtonClick(obj) {
@@ -67,16 +203,16 @@ function deleteButtonClick(obj) {
     tr.parentElement.removeChild(tr);
 }
 
-function addButtonClick(obj) {
-    let addNewTrChildren = obj.parentElement.parentElement.children;
-    let input = addNewTrChildren[1].children[0];
+function addButtonClick() {
+    let addTrChildren = document.getElementById('add-tr').children;
+    let input = addTrChildren[1].children[0];
     let pattern = input.value;
     if (pattern === '') {
         input.placeholder = '模式不能为空。';
         return;
     }
     let isRegExp;
-    switch (addNewTrChildren[0].children[0].value) {
+    switch (addTrChildren[0].children[0].value) {
         case 'regexp':
             try {
                 new RegExp(pattern);
@@ -123,4 +259,5 @@ function addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern) 
     documentFragment.appendChild(newTr);
 }
 
+initElements();
 generateBlockedPatternTable();

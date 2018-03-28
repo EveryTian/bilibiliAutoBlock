@@ -176,3 +176,19 @@ input[type="text"]:focus {
     visibility: visible;
     opacity: 1;
 }
+
+a {
+    color: #4064b5;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+p {
+    font-size: 1.2em;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+strong {
+    font-size: 1.2em;
+}

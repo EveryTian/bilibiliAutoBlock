@@ -6,18 +6,26 @@ let recordJson = {};
 //     }
 // }
 
+const recordStampPrefix = storageName.recordStampPrefix;
+const recordStampPrefixLength = recordStampPrefix.length;
+
 function generateRecordTable() {
     let recordDateTimeNumbers = Object.keys(localStorage)
-        .filter(x => x.substring(0, 5) === '#LOG#')
-        .map(x => parseInt(x.substring(5)))
+        .filter(x => x.substring(0, recordStampPrefixLength) === recordStampPrefix)
+        .map(x => parseInt(x.substring(recordStampPrefixLength)))
         .sort((a, b) => b - a);
     if (recordDateTimeNumbers.length === 0) {
         addEmptyPromptTr();
         return;
     }
     let documentFragment = new DocumentFragment();
+    let expirationDate = new Date().getTime() - parseInt(localStorage[storageName.recordExpirationTime]) * 86400000;
     for (let dateTimeNumber of recordDateTimeNumbers) {
-        let blockedUsersList = JSON.parse(localStorage['#LOG#' + dateTimeNumber]);
+        if (dateTimeNumber < expirationDate) {
+            delete localStorage[recordStampPrefix + dateTimeNumber];
+            continue;
+        }
+        let blockedUsersList = JSON.parse(localStorage[recordStampPrefix + dateTimeNumber]);
         recordJson[dateTimeNumber] = blockedUsersList;
         Object.keys(blockedUsersList).forEach(userIdAndBlockId => {
             let separatorIndex = userIdAndBlockId.indexOf('&');
@@ -40,14 +48,14 @@ function deleteButtonClick(obj) {
     delete recordJson[dateTimeNumberString][userIdAndBlockId];
     if (isEmptyObject(recordJson[dateTimeNumberString])) {
         delete recordJson[dateTimeNumberString];
-        delete localStorage['#LOG#' + dateTimeNumberString];
+        delete localStorage[recordStampPrefix + dateTimeNumberString];
         let trElement = obj.parentElement.parentElement;
         trElement.parentElement.removeChild(trElement);
         if (isEmptyObject(recordJson)) {
             addEmptyPromptTr();
         }
     } else {
-        localStorage['#LOG#' + dateTimeNumberString] = JSON.stringify(recordJson[dateTimeNumberString]);
+        localStorage[recordStampPrefix + dateTimeNumberString] = JSON.stringify(recordJson[dateTimeNumberString]);
         let trElement = obj.parentElement.parentElement;
         trElement.parentElement.removeChild(trElement);
     }
@@ -65,38 +73,14 @@ function generateTr(userId, blockId, dateTimeNumber, danmakuContent) {
     return trElement;
 }
 
-function getDateTimeString(date) {
-    if (Object.prototype.toString.call(date) === '[object Date]') {
-        return '' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
-            + ' ' + date.getHours() + ':' + date.getMinutes();
-    } else if (typeof date === 'number') {
-        date = new Date(date);
-        return '' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
-            + ' ' + date.getHours() + ':' + date.getMinutes();
-    }
-}
-
 function addEmptyPromptTr() {
     let emptyPromptTr = document.createElement('tr');
     emptyPromptTr.innerHTML = '<td>-</td><td>尚无屏蔽记录</td><td>-</td>';
     document.getElementById('record-table-body').appendChild(emptyPromptTr);
 }
 
-function isEmptyObject(obj) {
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function unblockUser(blockId) {
-    let xmlHttpRequest = new XMLHttpRequest();
-    xmlHttpRequest.withCredentials = true;
-    xmlHttpRequest.open('POST', 'https://api.bilibili.com/x/dm/filter/user/del', true);
-    xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-    xmlHttpRequest.send('ids=' + blockId + '&jsonp=jsonp&csrf');
+    post('https://api.bilibili.com/x/dm/filter/user/del', 'ids=' + blockId + '&jsonp=jsonp&csrf');
 }
 
 generateRecordTable();

@@ -10,12 +10,51 @@
     <thead>
     <tr>
         <td></td>
-        <td><img src="../img/logo.png" alt="bilibiliAutoBlock" height="50"/></td>
+        <td><img src="/img/logo.png" alt="bilibiliAutoBlock" height="50"/></td>
         <td><h1>bilibliAutoBlock 选项</h1></td>
         <td></td>
     </tr>
     </thead>
     <tbody>
+    <tr>
+        <td></td>
+        <td>特殊选项</td>
+        <td>
+            <h2>1.弹幕位置相关</h2>
+            <p>
+                <input type="checkbox" id="bottom-exception"/>
+                <label for="bottom-exception">不屏蔽底部弹幕</label>
+            </p>
+            <p>
+                <input type="checkbox" id="top-exception"/>
+                <label for="top-exception">不屏蔽顶部弹幕</label>
+            </p>
+            <p>
+                <input type="checkbox" id="conversed-exception"/>
+                <label for="conversed-exception">不屏蔽逆向弹幕</label>
+            </p>
+            <h2>2.弹幕属性相关</h2>
+            <p>
+                <input type="checkbox" id="advanced-exception"/>
+                <label for="advanced-exception">不屏蔽高级弹幕</label>
+            </p>
+            <p>
+                <input type="checkbox" id="subtitle-exception"/>
+                <label for="subtitle-exception">不屏蔽字幕弹幕</label>
+            </p>
+            <p>
+                <input type="checkbox" id="date-exception"/>
+                <label for="date-exception">不屏蔽这一时间之前的弹幕</label>
+                <code id="select-date" hidden="hidden">
+                    <select id="select-year" name="select-year" title="年"></select>年
+                    <select id="select-month" name="select-month" title="月"></select>月
+                    <select id="select-day" name="select-day" title="日"></select>日
+                </code>
+            </p>
+            <p></p>
+        </td>
+        <td></td>
+    </tr>
     <tr>
         <td></td>
         <td>匹配模式</td>
@@ -30,7 +69,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                    <tr id="add-tr">
                         <td>
                             <select name="select-type" title="模式类型">
                                 <option value="string">文本</option>
@@ -48,8 +87,31 @@
         </td>
         <td></td>
     </tr>
+    <tr>
+        <td></td>
+        <td>历史记录</td>
+        <td>
+            <p><a href="record.html">点击查看</a></p>
+            <p>
+                历史屏蔽记录保留时间：【
+                <select id="record-expiration-time" name="record-expiration-time" title="日志时间">
+                    <option value="7">7天</option>
+                    <option value="15">15天</option>
+                    <option value="30">30天</option>
+                </select>
+                】（超过这一时间的记录将被清理以减少空间占用）
+            </p>
+            <p>
+                清空历史屏蔽记录：
+                <button type="button" id="clear-history" class="delete-button">点击立即清空</button>
+            </p>
+        </td>
+        <td></td>
+    </tr>
     </tbody>
 </table>
+<script src="/utils/utils.js"></script>
+<script src="/utils/storage-name.js"></script>
 <script src="options.js"></script>
 </body>
 </html>
