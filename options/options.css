@@ -124,7 +124,7 @@ button:hover.delete-button {
     color: white;
 }
 
-button:hover#add-button {
+button:hover.option-button {
     background-color: #96b97d;
     color: white;
 }
@@ -175,6 +175,31 @@ input[type="text"]:focus {
 .tooltip:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
+}
+
+input[type="checkbox"] + label::before {
+    content: "\a0";
+    display: inline-block;
+    vertical-align: 0.2em;
+    width: 0.8em;
+    height: 0.8em;
+    margin-right: 0.2em;
+    border: 1px solid #3091d5;
+    border-radius: 3px;
+    background-color: #f0f0f0;
+    text-indent: 0.1em;
+    line-height: 0.65;
+}
+
+input[type="checkbox"]:checked + label::before {
+    content: "\2713";
+
+    background-color: #2da3d5;
+}
+
+input[type="checkbox"] {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
 }
 
 a {

@@ -18,40 +18,56 @@
     <tbody>
     <tr>
         <td></td>
-        <td>特殊选项</td>
         <td>
-            <h2>1.弹幕位置相关</h2>
-            <p>
-                <input type="checkbox" id="bottom-exception"/>
-                <label for="bottom-exception">不屏蔽底部弹幕</label>
+            特殊选项
+            <p style="font-size: 0.2em" hidden="hidden"> <!--TODO: Remove "hidden"-->
+                <input type="checkbox" id="file-io-checkbox" style="border: #66afe9"/>
+                <label for="file-io-checkbox">文件读取</label>
             </p>
-            <p>
-                <input type="checkbox" id="top-exception"/>
-                <label for="top-exception">不屏蔽顶部弹幕</label>
-            </p>
-            <p>
-                <input type="checkbox" id="conversed-exception"/>
-                <label for="conversed-exception">不屏蔽逆向弹幕</label>
-            </p>
-            <h2>2.弹幕属性相关</h2>
-            <p>
-                <input type="checkbox" id="advanced-exception"/>
-                <label for="advanced-exception">不屏蔽高级弹幕</label>
-            </p>
-            <p>
-                <input type="checkbox" id="subtitle-exception"/>
-                <label for="subtitle-exception">不屏蔽字幕弹幕</label>
-            </p>
-            <p>
-                <input type="checkbox" id="date-exception"/>
-                <label for="date-exception">不屏蔽这一时间之前的弹幕</label>
-                <code id="select-date" hidden="hidden">
-                    <select id="select-year" name="select-year" title="年"></select>年
-                    <select id="select-month" name="select-month" title="月"></select>月
-                    <select id="select-day" name="select-day" title="日"></select>日
-                </code>
-            </p>
-            <p></p>
+        </td>
+        <td>
+            <div>
+                <h2>1.弹幕位置相关</h2>
+                <p>
+                    <input type="checkbox" id="bottom-exception"/>
+                    <label for="bottom-exception">不屏蔽底部弹幕</label>
+                </p>
+                <p>
+                    <input type="checkbox" id="top-exception"/>
+                    <label for="top-exception">不屏蔽顶部弹幕</label>
+                </p>
+                <p>
+                    <input type="checkbox" id="conversed-exception"/>
+                    <label for="conversed-exception">不屏蔽逆向弹幕</label>
+                </p>
+            </div>
+            <div>
+                <h2>2.弹幕属性相关</h2>
+                <p>
+                    <input type="checkbox" id="advanced-exception"/>
+                    <label for="advanced-exception">不屏蔽高级弹幕</label>
+                </p>
+                <p>
+                    <input type="checkbox" id="subtitle-exception"/>
+                    <label for="subtitle-exception">不屏蔽字幕弹幕</label>
+                </p>
+                <p>
+                    <input type="checkbox" id="date-exception"/>
+                    <label for="date-exception">不屏蔽这一时间之前的弹幕</label>
+                    <code id="select-date" hidden="hidden">
+                        <select id="select-year" name="select-year" title="年"></select>年
+                        <select id="select-month" name="select-month" title="月"></select>月
+                        <select id="select-day" name="select-day" title="日"></select>日
+                    </code>
+                </p>
+            </div>
+            <div id="file-io" hidden="hidden">
+                <h2>3.选项导入导出</h2>
+                <p>
+                    <button id="import-options" type="button" class="option-button">从文件导入选项</button>
+                    <button id="export-options" type="button" class="option-button">导出选项到文件</button>
+                </p>
+            </div>
         </td>
         <td></td>
     </tr>
@@ -78,7 +94,7 @@
                         </td>
                         <td><input id="pattern-input" type="text" placeholder="请输入匹配模式"/></td>
                         <td>
-                            <button type="button" id="add-button">添加</button>
+                            <button type="button" id="add-button" class="option-button">添加</button>
                         </td>
                     </tr>
                     </tbody>

@@ -99,6 +99,9 @@ function initElements() {
             });
         }
     };
+    document.getElementById('file-io-checkbox').onchange = function () {
+        document.getElementById('file-io').hidden = !this.checked;
+    };
 }
 
 function generateSelectDayOptions() {
