@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <title>屏蔽记录</title>
     <link rel="stylesheet" type="text/css" href="options.css">
+    <style>
+        #change-mode-button {
+            position: fixed;
+            top: 20px;
+            right: 1%;
+            border: 1px solid silver;
+            border-radius: 5px;
+        }
+
+        #change-mode-prompt {
+            font-size: 0.5em;
+        }
+    </style>
 </head>
 <body>
 <div style="width:85%;text-align:center;margin-left:auto;margin-right:auto">
+    <button type="button" class="option-button" id="change-mode-button" hidden="hidden"> <!--TODO: Remove "hidden"-->
+        【<span id="change-mode-prompt">取消屏蔽</span>】<br>
+        点击更改模式
+    </button>
     <table class="table">
         <thead>
         <tr>
