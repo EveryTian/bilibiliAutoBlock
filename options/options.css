@@ -193,7 +193,6 @@ input[type="checkbox"] + label::before {
 
 input[type="checkbox"]:checked + label::before {
     content: "\2713";
-
     background-color: #2da3d5;
 }
 
