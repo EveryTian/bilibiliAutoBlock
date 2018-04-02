@@ -6,8 +6,13 @@ let recordJson = {};
 //     }
 // }
 
+const deleteRecordPrompt = '删除记录';
+const unblockUserPrompt = '取消屏蔽';
+
 const recordStampPrefix = storageName.recordStampPrefix;
 const recordStampPrefixLength = recordStampPrefix.length;
+
+let isDeleteRecordMode = false;
 
 function generateRecordTable() {
     let recordDateTimeNumbers = Object.keys(localStorage)
@@ -39,12 +44,32 @@ function generateRecordTable() {
     document.getElementById('record-table-body').appendChild(documentFragment);
 }
 
+function initializeChangeModeButton() {
+    document.getElementById('change-mode-button').onclick = () => {
+        isDeleteRecordMode = !isDeleteRecordMode;
+        let deleteButtons = document.getElementsByClassName('delete-button');
+        if (isDeleteRecordMode) {
+            for (let i = 0; i < deleteButtons.length; ++i) {
+                deleteButtons[i].innerHTML = deleteRecordPrompt;
+            }
+            document.getElementById('change-mode-prompt').innerHTML = deleteRecordPrompt;
+        } else {
+            for (let i = 0; i < deleteButtons.length; ++i) {
+                deleteButtons[i].innerHTML = unblockUserPrompt;
+            }
+            document.getElementById('change-mode-prompt').innerHTML = unblockUserPrompt;
+        }
+    };
+}
+
 function deleteButtonClick(obj) {
     let objName = obj.name;
     let separatorIndex = objName.indexOf('#');
     let dateTimeNumberString = objName.substring(separatorIndex + 1);
     let userIdAndBlockId = objName.substring(0, separatorIndex);
-    unblockUser(userIdAndBlockId.substring(userIdAndBlockId.indexOf('&') + 1));
+    if (!isDeleteRecordMode) {
+        unblockUser(userIdAndBlockId.substring(userIdAndBlockId.indexOf('&') + 1));
+    }
     delete recordJson[dateTimeNumberString][userIdAndBlockId];
     if (isEmptyObject(recordJson[dateTimeNumberString])) {
         delete recordJson[dateTimeNumberString];
@@ -66,7 +91,7 @@ function generateTr(userId, blockId, dateTimeNumber, danmakuContent) {
     trElement.innerHTML = '<td><div class="tooltip">' + userId + '<span class="tooltip-text">屏蔽时间：<br/>'
         + getDateTimeString(dateTimeNumber) + '</span></div></td><td>'
         + danmakuContent + '</td><td><button type="button" class="delete-button" name="'
-        + userId + '&' + blockId + '#' + dateTimeNumber + '">取消屏蔽</button></td>';
+        + userId + '&' + blockId + '#' + dateTimeNumber + '">' + unblockUserPrompt + '</button></td>';
     trElement.getElementsByTagName('button')[0].onclick = function () {
         deleteButtonClick(this);
     };
@@ -83,4 +108,5 @@ function unblockUser(blockId) {
     post('https://api.bilibili.com/x/dm/filter/user/del', 'ids=' + blockId + '&jsonp=jsonp&csrf');
 }
 
+initializeChangeModeButton();
 generateRecordTable();
