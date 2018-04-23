@@ -1,4 +1,4 @@
-let recordJson = {};
+const recordJson = {};
 // Format of recordJson:
 // {
 //     time: {
@@ -15,7 +15,7 @@ const recordStampPrefixLength = recordStampPrefix.length;
 let isDeleteRecordMode = false;
 
 function generateRecordTable() {
-    let recordDateTimeNumbers = Object.keys(localStorage)
+    const recordDateTimeNumbers = Object.keys(localStorage)
         .filter(x => x.substring(0, recordStampPrefixLength) === recordStampPrefix)
         .map(x => parseInt(x.substring(recordStampPrefixLength)))
         .sort((a, b) => b - a);
@@ -23,18 +23,18 @@ function generateRecordTable() {
         addEmptyPromptTr();
         return;
     }
-    let documentFragment = new DocumentFragment();
-    let expirationDate = new Date().getTime() - parseInt(localStorage[storageName.recordExpirationTime]) * 86400000;
-    for (let dateTimeNumber of recordDateTimeNumbers) {
+    const documentFragment = new DocumentFragment();
+    const expirationDate = new Date().getTime() - parseInt(localStorage[storageName.recordExpirationTime]) * 86400000;
+    for (const dateTimeNumber of recordDateTimeNumbers) {
         if (dateTimeNumber < expirationDate) {
             delete localStorage[recordStampPrefix + dateTimeNumber];
             continue;
         }
-        let blockedUsersList = JSON.parse(localStorage[recordStampPrefix + dateTimeNumber]);
+        const blockedUsersList = JSON.parse(localStorage[recordStampPrefix + dateTimeNumber]);
         recordJson[dateTimeNumber] = blockedUsersList;
         Object.keys(blockedUsersList).forEach(userIdAndBlockId => {
-            let separatorIndex = userIdAndBlockId.indexOf('&');
-            let trElement = generateTr(
+            const separatorIndex = userIdAndBlockId.indexOf('&');
+            const trElement = generateTr(
                 userIdAndBlockId.substring(0, separatorIndex),
                 userIdAndBlockId.substring(separatorIndex + 1),
                 dateTimeNumber, blockedUsersList[userIdAndBlockId]);
@@ -47,7 +47,7 @@ function generateRecordTable() {
 function initializeChangeModeButton() {
     document.getElementById('change-mode-button').onclick = () => {
         isDeleteRecordMode = !isDeleteRecordMode;
-        let deleteButtons = document.getElementsByClassName('delete-button');
+        const deleteButtons = document.getElementsByClassName('delete-button');
         if (isDeleteRecordMode) {
             for (let i = 0; i < deleteButtons.length; ++i) {
                 deleteButtons[i].innerHTML = deleteRecordPrompt;
@@ -63,10 +63,10 @@ function initializeChangeModeButton() {
 }
 
 function deleteButtonClick(obj) {
-    let objName = obj.name;
-    let separatorIndex = objName.indexOf('#');
-    let dateTimeNumberString = objName.substring(separatorIndex + 1);
-    let userIdAndBlockId = objName.substring(0, separatorIndex);
+    const objName = obj.name;
+    const separatorIndex = objName.indexOf('#');
+    const dateTimeNumberString = objName.substring(separatorIndex + 1);
+    const userIdAndBlockId = objName.substring(0, separatorIndex);
     if (!isDeleteRecordMode) {
         unblockUser(userIdAndBlockId.substring(userIdAndBlockId.indexOf('&') + 1));
     }
@@ -74,20 +74,20 @@ function deleteButtonClick(obj) {
     if (isEmptyObject(recordJson[dateTimeNumberString])) {
         delete recordJson[dateTimeNumberString];
         delete localStorage[recordStampPrefix + dateTimeNumberString];
-        let trElement = obj.parentElement.parentElement;
+        const trElement = obj.parentElement.parentElement;
         trElement.parentElement.removeChild(trElement);
         if (isEmptyObject(recordJson)) {
             addEmptyPromptTr();
         }
     } else {
         localStorage[recordStampPrefix + dateTimeNumberString] = JSON.stringify(recordJson[dateTimeNumberString]);
-        let trElement = obj.parentElement.parentElement;
+        const trElement = obj.parentElement.parentElement;
         trElement.parentElement.removeChild(trElement);
     }
 }
 
 function generateTr(userId, blockId, dateTimeNumber, danmakuContent) {
-    let trElement = document.createElement('tr');
+    const trElement = document.createElement('tr');
     trElement.innerHTML = '<td><div class="tooltip">' + userId + '<span class="tooltip-text">屏蔽时间：<br/>'
         + getDateTimeString(dateTimeNumber) + '</span></div></td><td>'
         + danmakuContent + '</td><td><button type="button" class="delete-button" name="'
@@ -99,7 +99,7 @@ function generateTr(userId, blockId, dateTimeNumber, danmakuContent) {
 }
 
 function addEmptyPromptTr() {
-    let emptyPromptTr = document.createElement('tr');
+    const emptyPromptTr = document.createElement('tr');
     emptyPromptTr.innerHTML = '<td>-</td><td>尚无屏蔽记录</td><td>-</td>';
     document.getElementById('record-table-body').appendChild(emptyPromptTr);
 }

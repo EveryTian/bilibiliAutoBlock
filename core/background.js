@@ -1,5 +1,5 @@
 let blockedPatterns = [];
-let specialOptions = {
+const specialOptions = {
     bottomException: true,
     topException: true,
     conversedException: true,
@@ -11,7 +11,7 @@ let specialOptions = {
 initializeLocalStorage();
 
 chrome.webRequest.onBeforeRequest.addListener(details => {
-    let matchResult = /^https?:\/\/comment\.bilibili\.com\/\d+\.xml$/.exec(details.url);
+    const matchResult = /^https?:\/\/comment\.bilibili\.com\/\d+\.xml$/.exec(details.url);
     if (matchResult && details.type === 'xmlhttprequest') {
         if (localStorage[storageName.isBlockedPatternsChanged] === storageName.true) {
             console.log('Updating Blocked Patterns...');
@@ -26,7 +26,7 @@ chrome.webRequest.onBeforeRequest.addListener(details => {
             console.log('Special Options Updated.');
         }
         if (blockedPatterns.length !== 0) {
-            let xmlHttpRequest = new XMLHttpRequest();
+            const xmlHttpRequest = new XMLHttpRequest();
             debugLog('Danmaku File URI:', matchResult[0]);
             xmlHttpRequest.onreadystatechange = () => {
                 debugLog('     | readyState:', xmlHttpRequest.readyState);
@@ -50,18 +50,18 @@ function analyze(xmlString) {
     }
     debugLog('Analyzing Danmaku...');
     debugLog('XML String:', xmlString);
-    let xmlDomDiv = document.createElement('div');
+    const xmlDomDiv = document.createElement('div');
     xmlDomDiv.innerHTML = xmlString;
     debugLog('XML DOM:', xmlDomDiv);
-    let danmakuDomElements = xmlDomDiv.getElementsByTagName('d');
+    const danmakuDomElements = xmlDomDiv.getElementsByTagName('d');
     debugLog('XML DOM Danmaku Elements:', danmakuDomElements);
     debugLog('Blocked Patterns:', blockedPatterns);
-    let blockedDanmakuDomElements = [].filter.call(danmakuDomElements,
+    const blockedDanmakuDomElements = [].filter.call(danmakuDomElements,
         x => danmakuBlockCheck(x.innerHTML, x.getAttribute('p').split(',')));
     debugLog('Blocked Danmaku:', blockedDanmakuDomElements);
-    let blockedUsersInfo = {}; // { blockedUserId : blockedDanmakuContent }
+    const blockedUsersInfo = {}; // { blockedUserId : blockedDanmakuContent }
     for (let i = 0; i < blockedDanmakuDomElements.length; ++i) {
-        let blockedDanmakuDomElement = blockedDanmakuDomElements[i];
+        const blockedDanmakuDomElement = blockedDanmakuDomElements[i];
         blockedUsersInfo[blockedDanmakuDomElement.getAttribute('p').split(',')[6]] = blockedDanmakuDomElement.innerHTML;
     }
     debugLog('Blocked Users:', blockedUsersInfo);
@@ -111,7 +111,7 @@ function danmakuBlockCheck(danmakuContent, danmakuAttributes) {
     if (specialOptions.dateException !== 0 && parseInt(danmakuAttributes[4]) < specialOptions.dateException) {
         return false;
     }
-    for (let blockedPattern of blockedPatterns) {
+    for (const blockedPattern of blockedPatterns) {
         if (!blockedPattern) {
             continue;
         }
@@ -127,8 +127,8 @@ function danmakuBlockCheck(danmakuContent, danmakuAttributes) {
 
 function submitBlockedUsers(blockedUsersInfo) {
     debugLog('Submitting Blocked Users...');
-    let blockedUsersIdArray = Object.keys(blockedUsersInfo);
-    let submittedUsersInfo = {};
+    const blockedUsersIdArray = Object.keys(blockedUsersInfo);
+    const submittedUsersInfo = {};
     let submittedUsersCount = 0;
     blockedUsersIdArray.forEach(blockedUserId => {
         debugLog(' | Submitting `' + blockedUserId + '`...');
@@ -139,7 +139,7 @@ function submitBlockedUsers(blockedUsersInfo) {
                 debugLog('     | `' + blockedUserId + '` status:', xmlHttpRequest.status);
                 if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200) {
                     // {"code":0,"data":{"id":blockId,"mid":0,"type":0,"filter":userId,"comment":""},"message":"0","ttl":1}
-                    let blockResponse = JSON.parse(xmlHttpRequest.responseText);
+                    const blockResponse = JSON.parse(xmlHttpRequest.responseText);
                     if (blockResponse.code === 0) {
                         debugLog('     | Block `' + blockedUserId +
                             '(' + submittedUsersInfo[blockedUserId] + ')` Successfully.');
@@ -156,7 +156,7 @@ function submitBlockedUsers(blockedUsersInfo) {
                 if (isEmptyObject(submittedUsersInfo)) {
                     return;
                 }
-                let key = storageName.recordStampPrefix + new Date().getTime();
+                const key = storageName.recordStampPrefix + new Date().getTime();
                 localStorage[key] = JSON.stringify(submittedUsersInfo);
                 console.log(key, ':', submittedUsersInfo);
             } else {
@@ -169,15 +169,15 @@ function submitBlockedUsers(blockedUsersInfo) {
 }
 
 function updateBlockedPatterns() {
-    let localStorageBlockedPatterns = localStorage[storageName.blockedPatterns];
+    const localStorageBlockedPatterns = localStorage[storageName.blockedPatterns];
     if (!localStorageBlockedPatterns) {
         return [];
     }
     debugLog("Blocked Patterns Local Storage:", localStorageBlockedPatterns);
     blockedPatterns = [];
-    let blockedPatternsJson = JSON.parse(localStorageBlockedPatterns);
+    const blockedPatternsJson = JSON.parse(localStorageBlockedPatterns);
     debugLog('Blocked Patterns JSON:', blockedPatternsJson);
-    for (let patternFormatString in blockedPatternsJson) {
+    for (const patternFormatString in blockedPatternsJson) {
         if (blockedPatternsJson.hasOwnProperty(patternFormatString)) {
             blockedPatterns.push(
                 blockedPatternsJson[patternFormatString] ?
@@ -194,7 +194,7 @@ function updateSpecialOptions() {
     specialOptions.conversedException = localStorage[storageName.conversedException] === storageName.true;
     specialOptions.advancedException = localStorage[storageName.advancedException] === storageName.true;
     specialOptions.subtitleException = localStorage[storageName.subtitleException] === storageName.true;
-    let dateExceptionString = localStorage[storageName.dateException];
+    const dateExceptionString = localStorage[storageName.dateException];
     if (dateExceptionString === '') {
         specialOptions.dateException = 0;
     } else {

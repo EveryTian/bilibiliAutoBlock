@@ -2,7 +2,7 @@ let blockedPatternsJson = {}; // e.g. { "R#23{7}" : true, "T#可爱想" : false 
 const regExpPrefix = storageName.regExpPrefix;
 const textPrefix = storageName.textPrefix;
 
-function initElements() {
+function initPatternTable() {
     // Add pattern button click:
     document.getElementById('add-button').onclick = function () {
         addButtonClick(this);
@@ -13,12 +13,15 @@ function initElements() {
             document.getElementById('add-button').click();
         }
     };
+}
+
+function initBasicExceptionOptions() {
     // 5 checkboxes initialization:
-    let bottomExceptionCheckbox = document.getElementById('bottom-exception');
-    let topExceptionCheckbox = document.getElementById('top-exception');
-    let conversedExceptionCheckbox = document.getElementById('conversed-exception');
-    let advancedExceptionCheckbox = document.getElementById('advanced-exception');
-    let subtitleExceptionCheckbox = document.getElementById('subtitle-exception');
+    const bottomExceptionCheckbox = document.getElementById('bottom-exception');
+    const topExceptionCheckbox = document.getElementById('top-exception');
+    const conversedExceptionCheckbox = document.getElementById('conversed-exception');
+    const advancedExceptionCheckbox = document.getElementById('advanced-exception');
+    const subtitleExceptionCheckbox = document.getElementById('subtitle-exception');
     bottomExceptionCheckbox.onclick = topExceptionCheckbox.onclick = conversedExceptionCheckbox.onclick =
         advancedExceptionCheckbox.onclick = subtitleExceptionCheckbox.onclick = function () {
             checkboxClick(this);
@@ -28,23 +31,26 @@ function initElements() {
     conversedExceptionCheckbox.checked = localStorage[storageName.conversedException] === storageName.true;
     advancedExceptionCheckbox.checked = localStorage[storageName.advancedException] === storageName.true;
     subtitleExceptionCheckbox.checked = localStorage[storageName.subtitleException] === storageName.true;
+}
+
+function initDateExceptionOption() {
     // Date exception:
-    let curYear = new Date().getFullYear();
-    let selectYearElement = document.getElementById('select-year');
-    let selectYearOptions = selectYearElement.options;
+    const curYear = new Date().getFullYear();
+    const selectYearElement = document.getElementById('select-year');
+    const selectYearOptions = selectYearElement.options;
     for (let year = 2009; year < curYear; ++year) {
-        let yearString = '' + year;
+        const yearString = '' + year;
         selectYearOptions.add(new Option(yearString, yearString));
     }
     selectYearOptions.add(new Option('' + curYear, '' + curYear, true, true));
-    let selectMonthElement = document.getElementById('select-month');
-    let selectMonthOptions = selectMonthElement.options;
+    const selectMonthElement = document.getElementById('select-month');
+    const selectMonthOptions = selectMonthElement.options;
     for (let month = 1; month <= 12; ++month) {
-        let monthString = '' + month;
+        const monthString = '' + month;
         selectMonthOptions.add(new Option(monthString, monthString.length === 2 ? monthString : '0' + monthString));
     }
-    let selectDayElement = document.getElementById('select-day');
-    let updateDateExceptionString = () => {
+    const selectDayElement = document.getElementById('select-day');
+    const updateDateExceptionString = () => {
         localStorage[storageName.dateException] = document.getElementById('select-year').value + '-' +
             document.getElementById('select-month').value + '-' + document.getElementById('select-day').value;
         localStorage[storageName.isSpecialOptionsChanged] = storageName.true;
@@ -54,7 +60,7 @@ function initElements() {
         updateDateExceptionString();
     };
     selectDayElement.onchange = updateDateExceptionString;
-    let dateExceptionCheckbox = document.getElementById('date-exception');
+    const dateExceptionCheckbox = document.getElementById('date-exception');
     dateExceptionCheckbox.onclick = function () {
         if (this.checked) {
             document.getElementById('select-date').hidden = false;
@@ -65,11 +71,11 @@ function initElements() {
             localStorage[storageName.isSpecialOptionsChanged] = storageName.true;
         }
     };
-    let dateExceptionString = localStorage[storageName.dateException];
+    const dateExceptionString = localStorage[storageName.dateException];
     if (dateExceptionString !== '') {
-        let yearString = dateExceptionString.substring(0, 4);
-        let monthString = dateExceptionString.substring(5, 7);
-        let dayString = dateExceptionString.substring(8, 10);
+        const yearString = dateExceptionString.substring(0, 4);
+        const monthString = dateExceptionString.substring(5, 7);
+        const dayString = dateExceptionString.substring(8, 10);
         selectYearElement.value = yearString;
         selectMonthElement.value = monthString;
         generateSelectDayOptions();
@@ -81,8 +87,11 @@ function initElements() {
         dateExceptionCheckbox.checked = false;
         document.getElementById('select-date').hidden = true;
     }
+}
+
+function initHistoryOprions() {
     // Select expiration time:
-    let selectRecordExpirationTime = document.getElementById('record-expiration-time');
+    const selectRecordExpirationTime = document.getElementById('record-expiration-time');
     selectRecordExpirationTime.onchange = function () {
         localStorage[storageName.recordExpirationTime] = this.value;
     };
@@ -99,19 +108,22 @@ function initElements() {
             });
         }
     };
+}
+
+function initFilePort() {
     // Options import from & export to file:
     document.getElementById('file-io-checkbox').onchange = function () {
         document.getElementById('file-io').hidden = !this.checked;
     };
     document.getElementById('import-options').onclick = () => document.getElementById('file-port').click();
     document.getElementById('file-port').onchange = () => {
-        let file = document.getElementById('file-port').files[0];
+        const file = document.getElementById('file-port').files[0];
         if (!file) {
             return;
         }
-        let reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = event => {
-            let content = event.target.result;
+            const content = event.target.result;
             // TODO: analyzeContent
         };
         reader.readAsText(file);
@@ -121,18 +133,26 @@ function initElements() {
     };
 }
 
+function initElements() {
+    initPatternTable();
+    initBasicExceptionOptions();
+    initDateExceptionOption();
+    initHistoryOprions();
+    // initFilePort();
+}
+
 function generateSelectDayOptions() {
-    let dayNum = getDaysNum(parseInt(document.getElementById('select-year').value),
+    const dayNum = getDaysNum(parseInt(document.getElementById('select-year').value),
         parseInt(document.getElementById('select-month').value));
-    let selectDayOptions = document.getElementById('select-day').options;
-    let curSelectDayOptionsNum = selectDayOptions.length;
+    const selectDayOptions = document.getElementById('select-day').options;
+    const curSelectDayOptionsNum = selectDayOptions.length;
     if (curSelectDayOptionsNum > dayNum) {
         for (let i = curSelectDayOptionsNum - 1; i >= dayNum; --i) {
             selectDayOptions.remove(i);
         }
     } else if (curSelectDayOptionsNum < dayNum) {
         for (let day = curSelectDayOptionsNum + 1; day <= dayNum; ++day) {
-            let dayString = '' + day;
+            const dayString = '' + day;
             selectDayOptions.add(new Option(dayString, dayString.length === 2 ? dayString : '0' + dayString));
         }
     }
@@ -141,10 +161,10 @@ function generateSelectDayOptions() {
 function generateBlockedPatternTable() {
     if (localStorage.blockedPatterns) {
         blockedPatternsJson = JSON.parse(localStorage.blockedPatterns);
-        let documentFragment = new DocumentFragment();
-        for (let pattern in blockedPatternsJson) {
+        const documentFragment = new DocumentFragment();
+        for (const pattern in blockedPatternsJson) {
             if (blockedPatternsJson.hasOwnProperty(pattern)) {
-                let isRegExp = blockedPatternsJson[pattern];
+                const isRegExp = blockedPatternsJson[pattern];
                 if (typeof isRegExp !== 'boolean' ||
                     pattern.substring(0, 2) !== (isRegExp ? regExpPrefix : textPrefix)) {
                     delete blockedPatternsJson[pattern];
@@ -153,7 +173,7 @@ function generateBlockedPatternTable() {
                 }
             }
         }
-        let addNewTr = document.getElementById('add-button').parentElement.parentElement;
+        const addNewTr = document.getElementById('add-button').parentElement.parentElement;
         addNewTr.parentElement.insertBefore(documentFragment, addNewTr);
     }
 }
@@ -164,7 +184,7 @@ function removePatternFromLocalStorage(isRegExp, pattern) {
 }
 
 function addPatternToLocalStorage(isRegExp, pattern) {
-    let newPatternFormatString = (isRegExp ? regExpPrefix : textPrefix) + pattern;
+    const newPatternFormatString = (isRegExp ? regExpPrefix : textPrefix) + pattern;
     if (newPatternFormatString in blockedPatternsJson) {
         return false;
     }
@@ -204,8 +224,8 @@ function checkboxClick(obj) {
 }
 
 function deleteButtonClick(obj) {
-    let tr = obj.parentElement.parentElement;
-    let trChildren = tr.children;
+    const tr = obj.parentElement.parentElement;
+    const trChildren = tr.children;
     let isRegExp;
     switch (trChildren[0].innerText) {
         case '正则':
@@ -218,15 +238,15 @@ function deleteButtonClick(obj) {
             tr.parentElement.removeChild(tr);
             return;
     }
-    let pattern = trChildren[1].innerText;
+    const pattern = trChildren[1].innerText;
     removePatternFromLocalStorage(isRegExp, pattern);
     tr.parentElement.removeChild(tr);
 }
 
 function addButtonClick() {
-    let addTrChildren = document.getElementById('add-tr').children;
-    let input = addTrChildren[1].children[0];
-    let pattern = input.value;
+    const addTrChildren = document.getElementById('add-tr').children;
+    const input = addTrChildren[1].children[0];
+    const pattern = input.value;
     if (pattern === '') {
         input.placeholder = '模式不能为空。';
         return;
@@ -259,18 +279,18 @@ function addButtonClick() {
 }
 
 function addNewPatternTr(isRegExp, pattern) {
-    let newTr = document.createElement('tr');
+    const newTr = document.createElement('tr');
     newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td><td>' + pattern
         + '</td><td><button type="button" class="delete-button">删除</button></td>';
     newTr.getElementsByTagName('button')[0].onclick = function () {
         deleteButtonClick(this);
     };
-    let addNewTr = document.getElementById('add-button').parentElement.parentElement;
+    const addNewTr = document.getElementById('add-button').parentElement.parentElement;
     addNewTr.parentElement.insertBefore(newTr, addNewTr);
 }
 
 function addNewPatternTrToDocumentFragment(documentFragment, isRegExp, pattern) {
-    let newTr = document.createElement('tr');
+    const newTr = document.createElement('tr');
     newTr.innerHTML = '<td>' + (isRegExp ? '正则' : '文本') + '</td><td>' + pattern
         + '</td><td><button type="button" class="delete-button">删除</button></td>';
     newTr.getElementsByTagName('button')[0].onclick = function () {

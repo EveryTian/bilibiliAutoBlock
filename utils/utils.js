@@ -1,6 +1,6 @@
 const debugSwitch = true;
 
-let debugLog = debugSwitch ? console.log : () => {
+const debugLog = debugSwitch ? console.log : () => {
 };
 
 function isNumber(obj) {
@@ -20,7 +20,7 @@ function isDate(obj) {
 }
 
 function isEmptyObject(obj) {
-    for (let key in obj) {
+    for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
             return false;
         }
@@ -40,7 +40,7 @@ function getDateTimeString(date) {
 }
 
 function post(url, data, callBackFn) {
-    let xmlHttpRequest = new XMLHttpRequest();
+    const xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.withCredentials = true;
     if (callBackFn !== undefined) {
         xmlHttpRequest.onreadystatechange = () => callBackFn(xmlHttpRequest);
@@ -62,7 +62,7 @@ function getDaysNum(year, month) {
 }
 
 function downloadFile(filename, content) {
-    let linkElement = document.createElement('a');
+    const linkElement = document.createElement('a');
     linkElement.download = filename;
     linkElement.href = URL.createObjectURL(new Blob([content]));
     linkElement.click();
