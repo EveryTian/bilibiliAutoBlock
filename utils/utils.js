@@ -60,3 +60,10 @@ function getDaysNum(year, month) {
     const daysNum = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     return daysNum[month - 1];
 }
+
+function downloadFile(filename, content) {
+    let linkElement = document.createElement('a');
+    linkElement.download = filename;
+    linkElement.href = URL.createObjectURL(new Blob([content]));
+    linkElement.click();
+}

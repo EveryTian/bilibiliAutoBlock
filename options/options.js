@@ -99,8 +99,25 @@ function initElements() {
             });
         }
     };
+    // Options import from & export to file:
     document.getElementById('file-io-checkbox').onchange = function () {
         document.getElementById('file-io').hidden = !this.checked;
+    };
+    document.getElementById('import-options').onclick = () => document.getElementById('file-port').click();
+    document.getElementById('file-port').onchange = () => {
+        let file = document.getElementById('file-port').files[0];
+        if (!file) {
+            return;
+        }
+        let reader = new FileReader();
+        reader.onload = event => {
+            let content = event.target.result;
+            // TODO: analyzeContent
+        };
+        reader.readAsText(file);
+    };
+    document.getElementById('export-options').onclick = () => {
+        // TODO: generateContent
     };
 }
 
