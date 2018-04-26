@@ -68,6 +68,16 @@
                     <button id="import-options" type="button" class="option-button">从文件导入选项</button>
                     <button id="export-options" type="button" class="option-button">导出选项到文件</button>
                 </p>
+                <p>
+                    导入模式：【
+                    <select name="import-mode" title="导入模式">
+                        <option value="write">覆盖</option>
+                        <option value="add">追加</option>
+                    </select>
+                    】
+                    <input type="checkbox" id="port-history"/>
+                    <label for="port-history">同时导入/导出历史记录</label>
+                </p>
             </div>
         </td>
         <td></td>
