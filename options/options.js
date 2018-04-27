@@ -72,7 +72,7 @@ function initDateExceptionOption() {
         }
     };
     const dateExceptionString = localStorage[storageName.dateException];
-    if (dateExceptionString !== '') {
+    if (dateExceptionString) {
         const yearString = dateExceptionString.substring(0, 4);
         const monthString = dateExceptionString.substring(5, 7);
         const dayString = dateExceptionString.substring(8, 10);
@@ -99,22 +99,18 @@ function initHistoryOprions() {
     // Clear history button click:
     document.getElementById('clear-history').onclick = () => {
         if (confirm('确认清空历史屏蔽记录？') === true) {
-            const recordStampPrefix = storageName.recordStampPrefix;
-            const recordStampPrefixLength = recordStampPrefix.length;
-            Object.keys(localStorage).forEach(key => {
-                if (key.substring(0, recordStampPrefixLength) === recordStampPrefix) {
-                    delete localStorage[key];
-                }
-            });
+            clearHistory();
         }
     };
 }
 
 function initFilePort() {
     // Options import from & export to file:
-    document.getElementById('file-io-checkbox').onchange = function () {
+    const fileIOCheckboxElement = document.getElementById('file-io-checkbox');
+    fileIOCheckboxElement.onchange = function () {
         document.getElementById('file-io').hidden = !this.checked;
     };
+    fileIOCheckboxElement.checked = false;
     document.getElementById('import-options').onclick = () => document.getElementById('file-port').click();
     document.getElementById('file-port').onchange = () => {
         const file = document.getElementById('file-port').files[0];
@@ -123,13 +119,134 @@ function initFilePort() {
         }
         const reader = new FileReader();
         reader.onload = event => {
-            const content = event.target.result;
-            // TODO: analyzeContent
+            let importContent;
+            let blockedPatterns;
+            const blockedPatternsStorageName = storageName.blockedPatterns;
+            try {
+                importContent = JSON.parse(event.target.result);
+                const blockedPatternsString = importContent[blockedPatternsStorageName];
+                if (blockedPatternsString !== undefined) {
+                    blockedPatterns = JSON.parse(blockedPatternsString);
+                    delete importContent[blockedPatternsStorageName];
+                }
+            } catch (e) {
+                alert('导入失败...');
+                return;
+            }
+            const regExpPatternPrefix = storageName.regExpPrefix;
+            const textPatternPrefix = storageName.textPrefix;
+            const regExpPatternPrefixLength = regExpPatternPrefix.length;
+            Object.keys(blockedPatterns).forEach(pattern => {
+                if (pattern.startsWith(regExpPatternPrefix) && blockedPatterns[pattern] === true) {
+                    try {
+                        new RegExp(pattern.substring(regExpPatternPrefixLength));
+                    } catch (e) {
+                        delete blockedPatterns[pattern];
+                    }
+                } else if (!pattern.startsWith(textPatternPrefix) || blockedPatterns[pattern] !== false) {
+                    delete blockedPatterns[pattern];
+                }
+            });
+            const isImportHistory = document.getElementById('port-history').checked;
+            if (document.getElementById('import-mode').value === 'write') {
+                reinitializeLocalStorage();
+                if (isImportHistory) {
+                    clearHistory();
+                }
+                localStorage[blockedPatternsStorageName] = JSON.stringify(blockedPatterns);
+            } else {
+                const newBlockedPatterns = JSON.parse(localStorage[blockedPatternsStorageName]);
+                Object.assign(newBlockedPatterns, blockedPatterns);
+                localStorage[blockedPatternsStorageName] = JSON.stringify(newBlockedPatterns);
+            }
+            const dateExceptionStorageName = storageName.dateException;
+            const dateException = importContent[dateExceptionStorageName];
+            if (dateException !== undefined) {
+                if (dateException === '' || /\d{4}-\d\d-\d\d/.exec(dateException) !== null) {
+                    localStorage[dateExceptionStorageName] = dateException;
+                }
+                delete importContent[dateExceptionStorageName];
+            }
+            const recordExpirationTimeStorageName = storageName.recordExpirationTime;
+            const recordExpirationTime = importContent[recordExpirationTimeStorageName];
+            if (recordExpirationTime !== undefined) {
+                const recordExpirationTimeString = '' + recordExpirationTime;
+                if (recordExpirationTimeString === '7'
+                    || recordExpirationTimeString === '15'
+                    || recordExpirationTimeString === '30') {
+                    localStorage[recordExpirationTimeStorageName] = recordExpirationTimeString;
+                }
+                delete importContent[recordExpirationTimeStorageName];
+            }
+            const recordStampPrefix = storageName.recordStampPrefix;
+            const recordStampPrefixLength = recordStampPrefix.length;
+            Object.keys(importContent).forEach(name => {
+                if (name in nameDefaultValuePairs) {
+                    const importValueString = '' + importContent[name];
+                    if (importValueString === 'true' || importValueString === 'false') {
+                        localStorage[name] = importContent[name];
+                    }
+                } else if (isImportHistory && name.startsWith(recordStampPrefix)) {
+                    if (isNaN(parseInt(name.substring(recordStampPrefixLength)))) {
+                        return;
+                    }
+                    let historyLogContent;
+                    try {
+                        historyLogContent = JSON.parse(importContent[name]);
+                    } catch (e) {
+                        return;
+                    }
+                    for (const logStamp in historyLogContent) {
+                        if (!historyLogContent.hasOwnProperty(logStamp)) {
+                            continue;
+                        }
+                        const logStampLength = logStamp.length;
+                        if (logStampLength < 3 || logStamp[0] === '&' || logStamp[logStampLength - 1] === '&') {
+                            return;
+                        }
+                        let andCount = 0;
+                        for (let i = 0; i < logStampLength; ++i) {
+                            const c = logStamp[i];
+                            if (c === '&') {
+                                if (++andCount > 1) {
+                                    return;
+                                }
+                            } else if (!('0' <= c && c <= '9' || 'a' <= c && c <= 'f')) {
+                                return;
+                            }
+                        }
+                        if (!isString(historyLogContent[logStamp])) {
+                            return;
+                        }
+                    }
+                    localStorage[name] = importContent[name];
+                }
+            });
+            location.reload();
         };
-        reader.readAsText(file);
+        if (confirm('确认从文件`' + file.name + '`*' +
+            (document.getElementById('import-mode').value === 'write' ? '覆盖' : '追加') + '*导入模式、选项' +
+            (document.getElementById('port-history').checked ? '及历史屏蔽记录' : '') + '？') === true) {
+            reader.readAsText(file);
+        }
     };
     document.getElementById('export-options').onclick = () => {
-        // TODO: generateContent
+        const exportContent = {};
+        Object.keys(nameDefaultValuePairs).forEach(name => {
+            exportContent[name] = localStorage[name];
+        });
+        const isExportedHistory = document.getElementById('port-history').checked;
+        if (isExportedHistory) {
+            const recordStampPrefix = storageName.recordStampPrefix;
+            const recordStampPrefixLength = recordStampPrefix.length;
+            Object.keys(localStorage).forEach(key => {
+                if (key.substring(0, recordStampPrefixLength) === recordStampPrefix) {
+                    exportContent[key] = localStorage[key];
+                }
+            });
+        }
+        makeDownload('bilibiliAutoBlock选项' + (isExportedHistory ? '（含历史屏蔽记录）' : '') + '.json',
+            JSON.stringify(exportContent));
     };
 }
 
@@ -138,7 +255,7 @@ function initElements() {
     initBasicExceptionOptions();
     initDateExceptionOption();
     initHistoryOprions();
-    // initFilePort();
+    initFilePort();
 }
 
 function generateSelectDayOptions() {
@@ -256,7 +373,7 @@ function addButtonClick() {
         case 'regexp':
             try {
                 new RegExp(pattern);
-            } catch (err) {
+            } catch (e) {
                 alert('正则表达式语法不正确。');
                 return;
             }

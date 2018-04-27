@@ -36,3 +36,19 @@ function initializeLocalStorage() {
         }
     });
 }
+
+function reinitializeLocalStorage() {
+    Object.keys(nameDefaultValuePairs).forEach(name => {
+        localStorage[name] = nameDefaultValuePairs[name];
+    });
+}
+
+function clearHistory() {
+    const recordStampPrefix = storageName.recordStampPrefix;
+    const recordStampPrefixLength = recordStampPrefix.length;
+    Object.keys(localStorage).forEach(key => {
+        if (key.substring(0, recordStampPrefixLength) === recordStampPrefix) {
+            delete localStorage[key];
+        }
+    });
+}

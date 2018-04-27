@@ -20,7 +20,7 @@
         <td></td>
         <td>
             特殊选项
-            <p style="font-size: 0.2em" hidden="hidden"> <!--TODO: Remove "hidden"-->
+            <p style="font-size: 0.2em">
                 <input type="checkbox" id="file-io-checkbox" style="border: #66afe9"/>
                 <label for="file-io-checkbox">文件读取</label>
             </p>
@@ -62,15 +62,15 @@
                 </p>
             </div>
             <div id="file-io" hidden="hidden">
-                <h2>3.选项导入导出</h2>
+                <h2>3.模式选项导入导出</h2>
                 <p>
-                    <input hidden="hidden" id="file-port" type="file" accept="text/*"/>
-                    <button id="import-options" type="button" class="option-button">从文件导入选项</button>
-                    <button id="export-options" type="button" class="option-button">导出选项到文件</button>
+                    <input hidden="hidden" id="file-port" type="file"/>
+                    <button id="import-options" type="button" class="option-button">从文件导入模式及选项</button>
+                    <button id="export-options" type="button" class="option-button">导出模式及选项到文件</button>
                 </p>
                 <p>
                     导入模式：【
-                    <select name="import-mode" title="导入模式">
+                    <select id="import-mode" title="导入模式">
                         <option value="write">覆盖</option>
                         <option value="add">追加</option>
                     </select>

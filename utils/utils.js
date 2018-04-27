@@ -61,7 +61,7 @@ function getDaysNum(year, month) {
     return daysNum[month - 1];
 }
 
-function downloadFile(filename, content) {
+function makeDownload(filename, content) {
     const linkElement = document.createElement('a');
     linkElement.download = filename;
     linkElement.href = URL.createObjectURL(new Blob([content]));
