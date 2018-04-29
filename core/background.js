@@ -149,8 +149,7 @@ function submitBlockedUsers(blockedUsersInfo) {
                 }
             });
     });
-
-    function finishJudge(previousSubmittedUsersCount) {
+    const finishJudge = previousSubmittedUsersCount => {
         setTimeout(() => {
             if (previousSubmittedUsersCount === submittedUsersCount) {
                 if (isEmptyObject(submittedUsersInfo)) {
@@ -163,8 +162,7 @@ function submitBlockedUsers(blockedUsersInfo) {
                 finishJudge(submittedUsersCount);
             }
         }, 1000);
-    }
-
+    };
     finishJudge(submittedUsersCount); // Interface implementation.
 }
 
